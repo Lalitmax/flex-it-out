@@ -16,9 +16,11 @@ export default function Hero() {
             Leverage computer vision to track and analyze physical activity in real-time turning movement into motivation.
           </p>
 
-          <Button size="lg" className="text-lg px-8">
-            Start Now
-          </Button>
+          <div className="text-center mb-8 md:pr-24">
+            <Button size="lg" className="text-lg px-8">
+              Start Now
+            </Button>
+          </div>
         </div>
 
         {/* Right Side - Image */}
