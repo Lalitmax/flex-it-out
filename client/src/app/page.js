@@ -1,5 +1,6 @@
 import Navbar from "./components/Navbar"
 import Hero from "./components/Hero"
+import FitnessTracker from "./components/FitnessTracker"
 
 
 export default function Page() {
