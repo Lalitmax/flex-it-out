@@ -1,27 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import axios from 'axios';
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { login } from "@/lib/features/auth/authSlice";
+
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const router = useRouter();
+    const dispatch = useDispatch();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(""); // Reset error message
-        console.log("login")
 
         try {
-            const response = await axios.post('http://localhost:5000/api/v1/user/login', {
+            console.log("1")
+            const response = await axios.post("http://localhost:5000/api/v1/user/login", {
                 email,
-                password
+                password,
+            },{
+                withCredentials:true,
             });
-            console.log("Login successful:", response.data);
-            // Handle successful login here (e.g., storing the token, redirecting etc.)
+            
+            console.log("2")
+
+            const token = response.data.token;
+            localStorage.setItem("token", token); // 
+            // Save token in localStorage
+            dispatch(login(response.data.user));  
+
+            console.log("Login successful, token saved:", token);
+
+            router.push("/"); // Redirect after login
+
         } catch (error) {
             setError("Failed to login. Please check your credentials and try again.");
             console.error("Login error:", error.response ? error.response.data : error.message);

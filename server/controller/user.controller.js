@@ -70,7 +70,7 @@ export const register = async (req,res) => {
 export const login = async (req,res) => {
 
     try {
-        
+        console.log("start")
         const {email , password} = req.body;
     
         if(!email || !password){
@@ -79,7 +79,7 @@ export const login = async (req,res) => {
                 message: "field found empty"
             })
         }
-    
+        console.log("end")
         const user = await User.findOne({ email });
     
         if (!user) {
@@ -242,16 +242,49 @@ export const deleteAccount = async (req, res) => {
 
 export const getAnalytics = async (req, res) => {
     try {
-        const data = await User.findOne();
-        if (!data) return res.status(404).json({ message: "No data found" });
+        const user = await User.findById(req.user.id)
 
-        const caloriesBurned = (data.pushUps * 0.29) + (data.curls * 0.20) + (data.squats * 0.32);
+        if (!user) return res.status(404).json({ message: "No data found" });
 
-        res.json({ ...data.toObject(), caloriesBurned });
+        const caloriesBurned = (user.pushUps * 0.29) + (user.curls * 0.20) + (user.squats * 0.32);
+
+        res.status(200).json({ 
+            success: true, 
+            message: "user calories fetched successfully" ,
+            caloriesBurned
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+
+
+
+export const verifyToken = async (req, res) => {
+   
+    try {
+        console.log("1")
+        const { token } = req.cookies;
+
+        if (!token) {
+            return res.status(401).json({ success: false, message: "Unauthorized, token missing" });
+        }
+        console.log("2")
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const detail = await User.findById(decoded.userId);
+        return res.status(200).json({
+            success: true,
+            user: detail,
+            
+        });
+
+    } catch (error) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+    }
+};
+
 
 
 

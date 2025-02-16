@@ -56,8 +56,10 @@ export default function SignupForm() {
       });
 
       if (response.data.success) {
+        const token = response.data.token;
+        localStorage.setItem("token", token); // 
         setSuccess(true);
-        setTimeout(() => router.push("/auth/login"), 2000);
+        setTimeout(() => router.push("/"), 2000);
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message 
