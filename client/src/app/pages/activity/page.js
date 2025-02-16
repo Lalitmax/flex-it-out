@@ -7,7 +7,7 @@ const page = () => {
     <>
     <div className="bg-[#F4F9FF] flex flex-col min-h-screen gap-14  pt-5">
         <Navbar/>
-        {/* <Analytics/> */}
+        <Analytics/>
     </div>
     </>
     

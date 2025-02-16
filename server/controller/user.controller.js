@@ -1,290 +1,369 @@
-import { User } from "../model/userModel.js"
+// Schedule the function to run every midnight
+import cron from "node-cron";
+import { User } from "../model/userModel.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
-export const register = async (req,res) => {
+export const register = async (req, res) => {
+  try {
+    console.log("papa");
+    const { name, surname, email, mobile, password } = req.body;
+    console.log(req.body);
 
-    try {
-
-        console.log("papa");
-        const {name,surname,email,mobile,password} = req.body;
-        console.log(req.body)
-
-        if(!name || !surname || !email || !mobile || !password){
-            return res.status(400).json({
-                success: false,
-                message: "field found empty"
-            })
-        }
-
-        const user = await User.findOne({ email });
-
-        if (user) {
-            return res.status(400).json({
-            message: "User already exists with this email.",
-            success: false,
-            });
-        }
-
-        const hashedPass =await bcrypt.hash(password,10);
-
-        const newUser = new User({
-            name,
-            surname,
-            email,
-            password: hashedPass,
-            mobile,
-          });
-      
-          await newUser.save();
-      
-          const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-            expiresIn: "2d",
-          });
-
-          const options = {
-            expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-            httpOnly: true,
-            sameSite: "none",
-            secure: true,
-          }
-      
-          res.status(201).cookie("token",token,options).json({
-            message: "Registered successfully",
-            success: true,
-            token,
-            newUser
-          });
-
-    } catch (error) {
-        res.status(500).json({ 
-            message: "Server error", 
-            success: false, 
-            error
-        });
+    if (!name || !surname || !email || !mobile || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "field found empty",
+      });
     }
 
-}
+    const user = await User.findOne({ email });
 
-
-export const login = async (req,res) => {
-
-    try {
-        console.log("start")
-        const {email , password} = req.body;
-    
-        if(!email || !password){
-            return res.status(400).json({
-                success: false,
-                message: "field found empty"
-            })
-        }
-        console.log("end")
-        const user = await User.findOne({ email });
-    
-        if (!user) {
-            return res.status(400).json({
-                message: "user not found",
-                success: false,
-            });
-        }
-
-        const comparePass =await bcrypt.compare(password,user.password)
-        if (!comparePass) {
-            return res.status(400).json({
-              message: "Incorrect password.",
-              success: false,
-            });
-        }
-
-        
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-                expiresIn: "2d",
-            });
-
-          const options = {
-                expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-                httpOnly: true,
-                sameSite: "none",
-                secure: true,
-            }
-      
-          res.status(201).cookie("token",token,options).json({
-                message: "logged in successfully",
-                success: true,
-                token,
-                user
-            });
-
-        
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Internal Server Error",
-            error
-        });
+    if (user) {
+      return res.status(400).json({
+        message: "User already exists with this email.",
+        success: false,
+      });
     }
 
+    const hashedPass = await bcrypt.hash(password, 10);
 
+    const newUser = new User({
+      name,
+      surname,
+      email,
+      password: hashedPass,
+      mobile,
+    });
 
+    await newUser.save();
 
-}
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "2d",
+    });
 
+    const options = {
+      expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    };
+
+    res.status(201).cookie("token", token, options).json({
+      message: "Registered successfully",
+      success: true,
+      token,
+      newUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      success: false,
+      error,
+    });
+  }
+};
+
+export const login = async (req, res) => {
+  try {
+    console.log("start");
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "field found empty",
+      });
+    }
+    console.log("end");
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "user not found",
+        success: false,
+      });
+    }
+
+    const comparePass = await bcrypt.compare(password, user.password);
+    if (!comparePass) {
+      return res.status(400).json({
+        message: "Incorrect password.",
+        success: false,
+      });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "2d",
+    });
+
+    const options = {
+      expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    };
+
+    res.status(201).cookie("token", token, options).json({
+      message: "logged in successfully",
+      success: true,
+      token,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
+  }
+};
 
 export const getLeaderboard = async (req, res) => {
-    try {
-        const topUsers = await User.aggregate([
-            {
-                $addFields: {
-                    totalExercises: { 
-                        $sum: ["$pushUps", "$curls", "$squats"] 
-                    }
-                }
-            },
-            { $sort: { totalExercises: -1 } }, 
-            { $limit: 3 }  
-        ]);
+  try {
+    const topUsers = await User.aggregate([
+      {
+        $addFields: {
+          totalExercises: {
+            $sum: ["$pushUps", "$curls", "$squats"],
+          },
+        },
+      },
+      { $sort: { totalExercises: -1 } },
+      { $limit: 3 },
+    ]);
 
-        res.status(200).json({
-            success: true,
-            leaderboard: topUsers
-        });
-
-    } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: "Server error", 
-            error 
-        });
-    }
+    res.status(200).json({
+      success: true,
+      leaderboard: topUsers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error,
+    });
+  }
 };
-
-
 
 export const getProfile = async (req, res) => {
-    try {
-        console.log("1")
-        const user = await User.findById(req.user.id).select("-password"); 
-        console.log("2")
-        if (!user){
-            return res.status(404).json({ 
-                success: false, 
-                message: "User not found" 
-            });
-        } 
-        console.log("3")
-        res.status(200).json({ 
-            success: true, 
-            user 
-        });
-    } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: "Server error" 
-        });
+  try {
+    console.log("1");
+    const user = await User.findById(req.user.id).select("-password");
+    console.log("2");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
+    console.log("3");
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
-
 
 export const updateNameAndPass = async (req, res) => {
-    try {
-        const { name, oldPassword, newPassword } = req.body;
-        const user = await User.findById(req.user.id);
+  try {
+    const { name, oldPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
 
-        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
 
-        if (name) user.name = name;
+    if (name) user.name = name;
 
-        if (oldPassword && newPassword) {
-            const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (oldPassword && newPassword) {
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
 
-            if (!isMatch) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Incorrect password" 
-                });  
-            } 
-
-            user.password = await bcrypt.hash(newPassword, 10);
-        }
-
-        await user.save();
-
-        res.status(200).json({ 
-            success: true, 
-            message: "Profile updated successfully" 
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: "Incorrect password",
         });
-    } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: "Server error" 
-        });
+      }
+
+      user.password = await bcrypt.hash(newPassword, 10);
     }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
-
-
 
 export const deleteAccount = async (req, res) => {
-    try {
-        await User.findByIdAndDelete(req.user.id);
-        res.status(200).json({ 
-            success: true, 
-            message: "Account deleted successfully" 
-        });
-    } catch (error) {
-        res.status(500).json({ 
-            success: false, 
-            message: "Server error" 
-        });
-    }
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.status(200).json({
+      success: true,
+      message: "Account deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
-
 
 export const getAnalytics = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id)
+  try {
+    const user = await User.findById(req.user.id);
 
-        if (!user) return res.status(404).json({ message: "No data found" });
+    if (!user) return res.status(404).json({ message: "No data found" });
 
-        const caloriesBurned = (user.pushUps * 0.29) + (user.curls * 0.20) + (user.squats * 0.32);
+    const caloriesBurned =
+      user.pushUps * 0.29 + user.curls * 0.2 + user.squats * 0.32;
 
-        res.status(200).json({ 
-            success: true, 
-            message: "user calories fetched successfully" ,
-            caloriesBurned
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    res.status(200).json({
+      success: true,
+      message: "user calories fetched successfully",
+      caloriesBurned,
+      pushUps: user.pushUps,
+      curls: user.curls,
+      squats: user.squats,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
-
-
-
 
 export const verifyToken = async (req, res) => {
-   
-    try {
-        console.log("1")
-        const { token } = req.cookies;
+  try {
+    const { token } = req.cookies;
 
-        if (!token) {
-            return res.status(401).json({ success: false, message: "Unauthorized, token missing" });
-        }
-        console.log("2")
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        const detail = await User.findById(decoded.userId);
-        return res.status(200).json({
-            success: true,
-            user: detail,
-            
-        });
-
-    } catch (error) {
-        return res.status(401).json({ success: false, message: "Invalid token" });
+    if (!token) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized, token missing" });
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const detail = await User.findById(decoded.userId);
+    return res.status(200).json({
+      success: true,
+      user: detail,
+    });
+  } catch (error) {
+    return res.status(401).json({ success: false, message: "Invalid token" });
+  }
 };
 
+export const updateExerciseCount = async (req, res) => {
+  try {
+    console.log("Received request!");
 
+    const { exercise } = req.body;
+    const userId = req.user.id; // Assuming authentication middleware sets `req.user`
 
+    console.log("Exercise from frontend:", exercise); // Expected values: pushup, curl, squat
 
+    // Map frontend names to schema field names
+    const exerciseMap = {
+      pushup: "pushUps",
+      curl: "curls",
+      squat: "squats",
+    };
+
+    const mappedExercise = exerciseMap[exercise];
+
+    if (!mappedExercise) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid exercise type" });
+    }
+
+    console.log("Updating:", mappedExercise);
+
+    await User.findByIdAndUpdate(userId, { $inc: { [mappedExercise]: 1 } });
+
+    res.json({ success: true, message: `${mappedExercise} count updated!` });
+  } catch (error) {
+    console.error("Update failed:", error);
+    res.status(500).json({ success: false, error: "Database update failed" });
+  }
+};
+
+// Function to reset exercise data at 12 AM and store history
+export const resetDailyExercise = async () => {
+  try {
+    const users = await User.find(); // Get all users
+
+    for (let user of users) {
+      // Calculate total calories burned
+      const caloriesBurned =
+        user.pushUps * 0.29 + user.curls * 0.2 + user.squats * 0.32;
+
+      // Store today's data before resetting
+      if (user.pushUps > 0 || user.curls > 0 || user.squats > 0) {
+        user.exerciseHistory.push({
+          date: new Date(),
+          pushUps: user.pushUps,
+          curls: user.curls,
+          squats: user.squats,
+          caloriesBurned: parseFloat(caloriesBurned.toFixed(2)), // Rounded to 2 decimal places
+        });
+
+        // Keep only last 10 days' data
+        if (user.exerciseHistory.length > 10) {
+          user.exerciseHistory.shift(); // Remove oldest entry
+        }
+      }
+
+      // Reset today's exercise data
+      user.pushUps = 0;
+      user.curls = 0;
+      user.squats = 0;
+
+      await user.save();
+    }
+    console.log("Exercise data reset at 11:31 PM");
+  } catch (error) {
+    console.error("Error resetting exercise data:", error);
+  }
+};
+
+// Schedule reset for 11:31 PM daily
+cron.schedule("12 0 * * *", () => {
+    console.log("Running daily exercise reset...");
+    resetDailyExercise();
+  });
+  
+
+export const getExerciseHistory = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id); // Assuming user ID is available from auth middleware
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      history: user.exerciseHistory,
+    });
+  } catch (error) {
+    console.error("Error fetching exercise history:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};

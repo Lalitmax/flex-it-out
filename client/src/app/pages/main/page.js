@@ -10,16 +10,16 @@ const Page = () => {
   const router = useRouter();
   const currPathname = usePathname();  
 
-  useEffect(() => {
-    // console.log()
-    if (!isAuthenticated) {
-      router.push( "/auth/login");
-    }
-  }, [isAuthenticated, router, currPathname]);
+  // useEffect(() => {
+  //   console.log(isAuthenticated)
+  //   if (!isAuthenticated) {
+  //     router.push( "/auth/login");
+  //   }
+  // }, [isAuthenticated, router, currPathname]);
 
-  if (!isAuthenticated) {
-    return null;  
-  }
+  // if (!isAuthenticated) {
+  //   return null;  
+  // }
 
   return (
     <div className="bg-[#F4F9FF] flex flex-col min-h-screen gap-8 pt-5">

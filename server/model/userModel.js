@@ -1,5 +1,29 @@
 import mongoose from "mongoose";
 
+const exerciseEntrySchema = mongoose.Schema({
+    date: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    pushUps: {
+        type: Number,
+        default: 0
+    },
+    curls: {
+        type: Number,
+        default: 0
+    },
+    squats: {
+        type: Number,
+        default: 0
+    },
+    caloriesBurned: {
+        type: Number,
+        default: 0
+    }
+});
+
 const userSchema = mongoose.Schema({
     name: {
         type: String,
@@ -32,7 +56,12 @@ const userSchema = mongoose.Schema({
     squats: {
         type: Number,
         default: 0
-    }
+    },
+    caloriesBurned: {
+        type: Number,
+        default: 0
+    },
+    exerciseHistory: [exerciseEntrySchema]  // Stores past 10 days' data
 }, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);

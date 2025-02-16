@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/app/components/ui/button";
-import { User, Trophy, Activity, Home } from "lucide-react";
+import { User, Trophy, Activity, Home, Share } from "lucide-react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "@/lib/features/auth/authSlice";
@@ -66,7 +66,9 @@ export default function Navbar() {
             href="/dashboard"
             className="text-gray-700 hover:text-gray-900 flex items-center gap-2"
           >
-            <Home className="w-5 h-5" /> Dashboard
+            <Button >
+              <Share  /> Share
+            </Button>
           </Link>
           <Link
             href="/pages/activity"
@@ -75,7 +77,7 @@ export default function Navbar() {
             <Activity className="w-5 h-5" /> Activity
           </Link>
           <Link
-            href="/leaderboard"
+            href="/pages/leaderboard"
             className="text-gray-700 hover:text-gray-900 flex items-center gap-2"
           >
             <Trophy className="w-5 h-5" /> Leaderboard
@@ -127,7 +129,7 @@ export default function Navbar() {
               href="/dashboard"
               className="text-gray-700 hover:text-gray-900"
             >
-              Dashboard
+              Share
             </Link>
             <Link
               href="/pages/activity"
@@ -136,7 +138,7 @@ export default function Navbar() {
               Activity
             </Link>
             <Link
-              href="/leaderboard"
+              href="/pages/leaderboard"
               className="text-gray-700 hover:text-gray-900"
             >
               Leaderboard
@@ -146,7 +148,9 @@ export default function Navbar() {
                 href="/pages/profile"
                 className="text-gray-700 hover:text-gray-900"
               >
-                Profile
+                <Button variant="outline" className="flex items-center gap-2">
+                  <User className="w-5 h-5" /> Profile
+                </Button>
               </Link>
             ) : (
               <Link
