@@ -1,7 +1,16 @@
+"use client"
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 export default function Hero() {
+
+  const router = useRouter(); // Initialize the router
+
+  const handleClick = () => {
+    router.push("/pages/main"); // Navigate to /pages/main
+  };
+
   return (
     <main className="px-4 py-16 md:py-24 lg:py-28">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
@@ -17,7 +26,7 @@ export default function Hero() {
           </p>
 
           <div className="text-center mb-8 md:pr-24">
-            <Button size="lg" className="text-lg px-8">
+            <Button onClick={handleClick}  size="lg" className="text-lg px-8">
               Start Now
             </Button>
           </div>

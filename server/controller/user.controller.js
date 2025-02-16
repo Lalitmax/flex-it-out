@@ -5,7 +5,10 @@ import jwt from "jsonwebtoken"
 export const register = async (req,res) => {
 
     try {
+
+        console.log("papa");
         const {name,surname,email,mobile,password} = req.body;
+        console.log(req.body)
 
         if(!name || !surname || !email || !mobile || !password){
             return res.status(400).json({

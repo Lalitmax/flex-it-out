@@ -128,21 +128,90 @@ const FitnessTracker = () => {
     }, []);
 
     return (
-        <div>
-            <div style={{ position: "relative", width: 640, height: 480 }}>
-                <video ref={videoRef} autoPlay style={{ position: "absolute", width: "100%", height: "100%" }} />
-                <canvas ref={canvasRef} style={{ position: "absolute", width: "100%", height: "100%" }} />
-            </div>
-            <div>
-                <h2>{currentExercise.toUpperCase()}</h2>
-                <p>Count: {counter}</p>
-                <p>Stage: {stage || "-"}</p>
-                {angleHistory.map((angle, i) => (
-                    <p key={i}>Angle {i + 1}: {angle.toFixed(1)}°</p>
-                ))}
-                <button onClick={() => changeExercise("curl")}>Curls (1)</button>
-                <button onClick={() => changeExercise("squat")}>Squats (2)</button>
-                <button onClick={() => changeExercise("pushup")}>Pushups (3)</button>
+        <div className="  text-white font-poppins">
+            <div className="container mx-auto px-4">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Video Preview Section */}
+                    <div className="flex-1 border-2 border-blue-600 relative rounded-xl overflow-hidden shadow-2xl">
+                        <video ref={videoRef} autoPlay className="absolute inset-0 w-full h-full object-cover" />
+                        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+                    </div>
+
+                    {/* Control Panel */}
+                    <div className="lg:w-96 bg-gray-800 rounded-xl p-6 shadow-2xl">
+                        <div className="mb-6">
+                            <h2 className="text-2xl font-bold mb-4 text-center">
+                                <span className={`inline-block px-4 py-2 rounded-full bg-[${exercises[currentExercise].color}]`}>
+                                    {currentExercise.toUpperCase()}
+                                </span>
+                            </h2>
+                            
+                            <div className="bg-gray-700 rounded-lg p-4 mb-4">
+                                <div className="text-4xl font-bold text-center mb-2 animate-pulse">
+                                    {counter}
+                                </div>
+                                <div className="text-center text-sm text-gray-300">
+                                    REPETITIONS
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="bg-gray-700 rounded-lg p-3 text-center">
+                                    <div className="text-xs text-gray-300 mb-1">CURRENT STAGE</div>
+                                    <div className="font-semibold text-lg">{stage || "-"}</div>
+                                </div>
+                                <div className="bg-gray-700 rounded-lg p-3 text-center">
+                                    <div className="text-xs text-gray-300 mb-1">ANGLE</div>
+                                    <div className="font-semibold text-lg">
+                                        {angleHistory[0] ? angleHistory[0].toFixed(1) + "°" : "-"}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Exercise Selector */}
+                        <div className="mb-8">
+                            <h3 className="text-sm font-semibold text-gray-400 mb-3">SELECT EXERCISE</h3>
+                            <div className="grid grid-cols-3 gap-3">
+                                {Object.entries(exercises).map(([key, ex]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => changeExercise(key)}
+                                        className={`p-2 rounded-lg text-sm font-medium transition-all ${currentExercise === key ? 'text-white' : 'text-gray-400'} ${currentExercise === key ? 'scale-105' : 'hover:scale-95'}`}
+                                        style={{
+                                            backgroundColor: currentExercise === key ? ex.color : '#2D3748',
+                                            border: currentExercise === key ? `2px solid ${ex.color}` : '2px solid #4A5568'
+                                        }}
+                                    >
+                                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Angle History */}
+                        <div>
+                            <h3 className="text-sm font-semibold text-gray-400 mb-3">ANGLE HISTORY</h3>
+                            <div className="space-y-2">
+                                {angleHistory.map((angle, i) => (
+                                    <div key={i} className="flex items-center bg-gray-700 rounded-md p-2">
+                                        <div className="w-20 text-xs text-gray-400">Frame {i + 1}</div>
+                                        <div className="flex-1 h-2 bg-gray-600 rounded-full">
+                                            <div 
+                                                className="h-2 rounded-full transition-all"
+                                                style={{
+                                                    width: `${(angle / 180) * 100}%`,
+                                                    backgroundColor: exercises[currentExercise].color
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="w-12 text-right text-sm">{angle?.toFixed(1)}°</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

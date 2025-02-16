@@ -8,7 +8,7 @@ import Link from "next/link"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const isAuthenticated = false // Replace with actual auth logic
+  const isAuthenticated = true // Replace with actual auth logic
 
   return (
     <nav className={`px-4 py-3 md:py-5 md:px-6 lg:px-8 bg-white rounded-full shadow-sm mx-4 md:mx-6 lg:mx-8 ${isMenuOpen ? "rounded-b-none" : ""}`}>
@@ -34,7 +34,7 @@ export default function Navbar() {
           </Link>
 
           {isAuthenticated ? (
-            <Link href="/profile">
+            <Link href="/pages/profile">
               <Button variant="outline" className="flex items-center gap-2">
                 <User className="w-5 h-5" /> Profile
               </Button>
@@ -68,7 +68,7 @@ export default function Navbar() {
               Leaderboard
             </Link>
             {isAuthenticated ? (
-              <Link href="/profile" className="text-gray-700 hover:text-gray-900">
+              <Link href="/pages/profile" className="text-gray-700 hover:text-gray-900">
                 Profile
               </Link>
             ) : (
