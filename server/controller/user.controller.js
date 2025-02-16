@@ -240,4 +240,18 @@ export const deleteAccount = async (req, res) => {
 };
 
 
+export const getAnalytics = async (req, res) => {
+    try {
+        const data = await User.findOne();
+        if (!data) return res.status(404).json({ message: "No data found" });
+
+        const caloriesBurned = (data.pushUps * 0.29) + (data.curls * 0.20) + (data.squats * 0.32);
+
+        res.json({ ...data.toObject(), caloriesBurned });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 
