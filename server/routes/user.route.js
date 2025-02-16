@@ -6,10 +6,11 @@ import { getProfile } from "../controller/user.controller.js";
 import { deleteAccount } from "../controller/user.controller.js";
 import { updateNameAndPass } from "../controller/user.controller.js";
 import { isAuth } from "../middleware/isAuthenticated.js";
+import { verifyToken } from "../controller/user.controller.js";
 
 const router = expess.Router();
 
-
+router.route("/verifyToken").get(verifyToken)
 router.route("/register").post(register)
 router.route("/login").post(login)
 router.route("/getLeaderboard").get(getLeaderboard)

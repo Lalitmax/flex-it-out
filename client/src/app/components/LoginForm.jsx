@@ -1,27 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import axios from 'axios';
+import axios from "axios";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get("redirect") || "/dashboard";
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(""); // Reset error message
-        console.log("login")
 
         try {
-            const response = await axios.post('http://localhost:5000/api/v1/user/login', {
+            const response = await axios.post("http://localhost:5000/api/v1/user/login", {
                 email,
-                password
+                password,
             });
             console.log("Login successful:", response.data);
-            // Handle successful login here (e.g., storing the token, redirecting etc.)
+
+            // Redirect to the original page or default to dashboard
+            router.push(redirectTo);
+
         } catch (error) {
             setError("Failed to login. Please check your credentials and try again.");
             console.error("Login error:", error.response ? error.response.data : error.message);

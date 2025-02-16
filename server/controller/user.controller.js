@@ -241,3 +241,27 @@ export const deleteAccount = async (req, res) => {
 
 
 
+
+export const verifyToken = async (req, res) => {
+    try {
+        const token = req.cookies.token; // Get token from cookies
+
+        if (!token) {
+            return res.status(401).json({ success: false, message: "Unauthorized, token missing" });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        return res.status(200).json({
+            success: true,
+            user: { id: decoded.userId },
+        });
+
+    } catch (error) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+    }
+};
+
+
+
+

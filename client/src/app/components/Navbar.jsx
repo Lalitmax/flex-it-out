@@ -1,19 +1,55 @@
 "use client"
-
-import { useState } from "react"
-import { Globe } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Button } from "@/app/components/ui/button"
 import { User, Trophy, Activity, Home } from "lucide-react"
 import Link from "next/link"
+import { useDispatch, useSelector } from "react-redux"
+import { login, logout } from "@/lib/features/auth/authSlice"
+import axios from "axios"
+import Cookies from "js-cookie"
+import { useRouter } from "next/navigation"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const isAuthenticated = true // Replace with actual auth logic
+
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
+  // Function to verify token
+  const verifyUser = async () => {
+    
+    try {
+      const token = Cookies.get("token"); // Fetch token from cookies
+
+      if (!token) {
+        dispatch(logout()); // If no token, log out the user
+        return;
+      }
+
+      const response = await axios.get("http://localhost:5000/api/v1/user/verifyToken", {
+        headers: {
+          Authorization: `dfcghbjytcyv ${token}`,
+        },
+        withCredentials: true, // Ensures cookies are sent
+      });
+
+      if (response.data.success) {
+        console.log(response.data.success)
+        dispatch(login(response.data.user)); // Update Redux state
+      } else {
+        dispatch(logout()); // If invalid, log out
+      }
+    } catch (error) {
+      dispatch(logout());
+    }
+  };
+
+  useEffect(() => {
+    verifyUser(); // Run verification on mount
+  }, []);
 
   return (
     <nav className={`px-4 py-3 md:py-5 md:px-6 lg:px-8 bg-white rounded-full shadow-sm mx-4 md:mx-6 lg:mx-8 ${isMenuOpen ? "rounded-b-none" : ""}`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/" className="text-2xl font-bold text-[#0066FF]">
@@ -58,23 +94,13 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden mt-4 px-4 py-4 bg-white rounded-b-xl shadow-lg mx-4">
           <div className="flex flex-col gap-4">
-            <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
-              Dashboard
-            </Link>
-            <Link href="/activity" className="text-gray-700 hover:text-gray-900">
-              Activity
-            </Link>
-            <Link href="/leaderboard" className="text-gray-700 hover:text-gray-900">
-              Leaderboard
-            </Link>
+            <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">Dashboard</Link>
+            <Link href="/activity" className="text-gray-700 hover:text-gray-900">Activity</Link>
+            <Link href="/leaderboard" className="text-gray-700 hover:text-gray-900">Leaderboard</Link>
             {isAuthenticated ? (
-              <Link href="/pages/profile" className="text-gray-700 hover:text-gray-900">
-                Profile
-              </Link>
+              <Link href="/pages/profile" className="text-gray-700 hover:text-gray-900">Profile</Link>
             ) : (
-              <Link href="/auth/login" className="text-gray-700 hover:text-gray-900">
-                Sign In
-              </Link>
+              <Link href="/auth/login" className="text-gray-700 hover:text-gray-900">Sign In</Link>
             )}
           </div>
         </div>

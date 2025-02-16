@@ -22,6 +22,7 @@ const FitnessTracker = () => {
 
     useEffect(() => {
         async function loadMediaPipe() {
+            if (!videoRef.current) return;
             const { Pose } = await import("@mediapipe/pose");
             const { Camera } = await import("@mediapipe/camera_utils");
             const drawingUtils = await import("@mediapipe/drawing_utils");
@@ -67,9 +68,10 @@ const FitnessTracker = () => {
     };
 
     const onResults = (results) => {
-        if (!results.poseLandmarks) return;
+        if (!results.poseLandmarks || !canvasRef.current) return;
 
         const canvasCtx = canvasRef.current.getContext("2d");
+        if (!canvasCtx) return;
         canvasCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
         drawConnectorsRef.current(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS_REF.current, { color: "#DC143C", lineWidth: 1 });
@@ -145,7 +147,7 @@ const FitnessTracker = () => {
                                     {currentExercise.toUpperCase()}
                                 </span>
                             </h2>
-                            
+
                             <div className="bg-gray-700 rounded-lg p-4 mb-4">
                                 <div className="text-4xl font-bold text-center mb-2 animate-pulse">
                                     {counter}
@@ -197,7 +199,7 @@ const FitnessTracker = () => {
                                     <div key={i} className="flex items-center bg-gray-700 rounded-md p-2">
                                         <div className="w-20 text-xs text-gray-400">Frame {i + 1}</div>
                                         <div className="flex-1 h-2 bg-gray-600 rounded-full">
-                                            <div 
+                                            <div
                                                 className="h-2 rounded-full transition-all"
                                                 style={{
                                                     width: `${(angle / 180) * 100}%`,
