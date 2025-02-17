@@ -14,12 +14,12 @@ export default function Navbar() {
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const userData = useSelector((state) => state.auth.user);
-  
+
   const dispatch = useDispatch();
   // Function to verify token
   const verifyUser = async () => {
     try {
-      
+
       const token = localStorage.getItem("token"); //
       if (!token) {
         dispatch(logout());
@@ -34,13 +34,13 @@ export default function Navbar() {
       );
 
       if (response.data.success) {
-        
+
         dispatch(login(response.data.user)); // Update Redux state
-        
+
       } else {
         dispatch(logout()); // If invalid, log out
       }
-      
+
     } catch (error) {
       dispatch(logout());
     }
@@ -52,9 +52,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`px-4 py-3 md:py-5 md:px-6 lg:px-8 bg-white rounded-full shadow-sm mx-4 md:mx-6 lg:mx-8 ${
-        isMenuOpen ? "rounded-b-none" : ""
-      }`}
+      className={`sticky top-7 border border-blue-100 transition-shadow duration-300   z-50 px-4 py-3 md:py-5 md:px-6 lg:px-8 bg-white rounded-full shadow-sm mx-4 md:mx-6 lg:mx-8 ${isMenuOpen ? "rounded-b-none" : ""
+        }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
@@ -71,7 +70,7 @@ export default function Navbar() {
             className="text-gray-700 hover:text-gray-900 flex items-center gap-2"
           >
             <Button >
-              <Share  /> Share
+              <Share /> Share
             </Button>
           </Link>
           <Link
@@ -102,9 +101,8 @@ export default function Navbar() {
 
         {/* Mobile menu button */}
         <button
-          className={`md:hidden p-2 rounded-full ${
-            isMenuOpen ? "bg-gray-100" : ""
-          }`}
+          className={`md:hidden p-2 rounded-full ${isMenuOpen ? "bg-gray-100" : ""
+            }`}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           <svg

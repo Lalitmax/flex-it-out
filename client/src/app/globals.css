@@ -66,11 +66,34 @@ body {
   * {
     @apply border-border;
   }
+
   .loginPage {
     @apply bg-background text-foreground;
   }
+
   body {
     @apply bg-background text-foreground;
   }
-  
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px; /* Width of the scrollbar */
+    height: 10px; /* Height of the horizontal scrollbar */
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background; /* Track color */
+    border-radius: 10px; /* Rounded corners */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border; /* Thumb color */
+    border-radius: 10px; /* Rounded corners */
+    border: 2px solid transparent; /* Adds padding around the thumb */
+    background-clip: content-box; /* Ensures the border doesn't overlap the background */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-foreground/50; /* Thumb color on hover */
+  }
 }

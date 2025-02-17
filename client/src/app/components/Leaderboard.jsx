@@ -53,15 +53,15 @@ export default function Leaderboard() {
   ];
 
   return (
-    <div className="p-6 bg-gray-900 min-h-screen text-white">
+    <div className="p-6 bg-gray-900   text-white rounded-3xl">
       {/* Header Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">🏆 Exercise Leaderboard</h1>
+      <div className="text-center mb-4">
+        <h1 className="text-2xl font-bold mb-1">🏆 Exercise Leaderboard</h1>
         <p className="text-gray-400">Top Performers of the Week</p>
       </div>
 
       {/* Podium Section */}
-      <div className="relative flex items-end justify-center gap-8 mb-16 flex-wrap md:flex-nowrap">
+      <div className="relative flex items-end justify-center gap-8 mb-5 flex-wrap md:flex-nowrap">
         {podiumOrder.map((user, index) => {
           const position = [1, 0, 2][index];
           const podiumHeight = position === 0 ? "h-72 sm:h-56" : position === 1 ? "h-64 sm:h-48" : "h-56 sm:h-40";
@@ -75,7 +75,7 @@ export default function Leaderboard() {
               </div>
 
               {/* User Card */}
-              <div className="flex flex-col items-center mb-4">
+              <div className="flex flex-col items-center mb-1">
                 <div className="w-20 h-20 rounded-full bg-gray-800 shadow-xl flex items-center justify-center mb-4">
                   <span className="text-2xl font-bold text-blue-400">
                     {user.name.charAt(0).toUpperCase()}
@@ -86,7 +86,7 @@ export default function Leaderboard() {
               </div>
 
               {/* Podium Platform */}
-              <div className={`w-48 ${podiumHeight} bg-gray-800 rounded-t-2xl shadow-2xl p-6`}>
+              <div className={`w-48 ${podiumHeight} bg-gray-800 rounded-t-2xl rounded-b-lg shadow-2xl p-6`}>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Push-ups:</span>
@@ -108,7 +108,7 @@ export default function Leaderboard() {
       </div>
 
       {/* Motivating Message */}
-      <div className="text-center bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
+      <div className="text-center bg-gray-800 p-3 rounded-2xl shadow-lg max-w-2xl mx-auto">
         <p className="text-xl font-semibold mb-2">🎉 Keep Pushing Your Limits! 🎉</p>
         <p className="text-gray-400">Every rep counts - climb your way to the top!</p>
       </div>
