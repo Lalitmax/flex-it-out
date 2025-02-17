@@ -13,8 +13,7 @@ export default function Hero() {
 
   return (
     <main className="px-4 py-16 md:py-24 lg:py-28">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
-
+      <div className="max-w-6xl gap-10 mx-auto flex flex-col-reverse md:flex-row items-center justify-between">
         {/* Left Side - Text Content */}
         <div className="md:w-1/2 text-center md:text-left ">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
@@ -26,7 +25,7 @@ export default function Hero() {
           </p>
 
           <div className="text-center mb-8 md:pr-24">
-            <Button onClick={handleClick}  size="lg" className="text-lg px-8">
+            <Button onClick={handleClick} size="lg" className="text-lg px-8">
               Start Now
             </Button>
           </div>

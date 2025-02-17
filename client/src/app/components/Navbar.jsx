@@ -14,7 +14,7 @@ export default function Navbar() {
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const userData = useSelector((state) => state.auth.user);
-
+  const [roomId, setRoomId] = useState(Math.floor(Math.random() * 10000));
   const dispatch = useDispatch();
   // Function to verify token
   const verifyUser = async () => {
@@ -66,11 +66,11 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
           <Link
-            href="/dashboard"
+            href={`/pages/challenges:${roomId}`} // Remove the ":" and directly use the roomId value
             className="text-gray-700 hover:text-gray-900 flex items-center gap-2"
           >
             <Button >
-              <Share /> Share
+              <Share /> Challenges
             </Button>
           </Link>
           <Link
@@ -128,10 +128,12 @@ export default function Navbar() {
         <div className="md:hidden mt-4 px-4 py-4 bg-white rounded-b-xl shadow-lg mx-4">
           <div className="flex flex-col gap-4">
             <Link
-              href="/dashboard"
+              href="/pages/challenges"
               className="text-gray-700 hover:text-gray-900"
             >
-              Share
+              <Button >
+                <Share /> Challenges
+              </Button>
             </Link>
             <Link
               href="/pages/activity"
