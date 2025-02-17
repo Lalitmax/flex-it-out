@@ -13,10 +13,13 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const userData = useSelector((state) => state.auth.user);
+  
   const dispatch = useDispatch();
   // Function to verify token
   const verifyUser = async () => {
     try {
+      
       const token = localStorage.getItem("token"); //
       if (!token) {
         dispatch(logout());
@@ -31,12 +34,13 @@ export default function Navbar() {
       );
 
       if (response.data.success) {
-        // console.log(response.data.success)
+        
         dispatch(login(response.data.user)); // Update Redux state
-        // console.log(response.data);
+        
       } else {
         dispatch(logout()); // If invalid, log out
       }
+      
     } catch (error) {
       dispatch(logout());
     }

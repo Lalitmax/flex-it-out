@@ -1,23 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ArrowPathIcon, CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
-export default function UserProfileManagement({user}) {
- 
+export default function UserProfileManagement() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    firstName : "",
+    lastName : "",
+    currentPassword :"1234" ,
+    newPassword :"1234",
+    confirmPassword: "1234",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Fetch user profile details on component mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/v1/user/getProfile", {
+          withCredentials: true,
+        });
+  
+        console.log("API Response:", response.data); // Debugging
+  
+        if (response.data.success) {
+          setFormData((prev) => ({
+            ...prev,
+            firstName: response.data.user?.name || "",
+            lastName: response.data.user?.surname || "",
+          }));
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setError("Failed to fetch user profile.");
+      }
+    };
+  
+    fetchProfile();
+  }, []);
+  
 
   const handleChange = (e) => {
     setFormData({
@@ -47,24 +74,23 @@ export default function UserProfileManagement({user}) {
 
     setLoading(true);
 
-    try { 
+    try {
       const response = await axios.post(
         "http://localhost:5000/api/v1/user/updateNameAndPass",
         {
-          name: formData.firstName,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           oldPassword: formData.currentPassword,
           newPassword: formData.newPassword,
         },
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          withCredentials: true,
         }
       );
 
       if (response.data.success) {
         setSuccess("Profile updated successfully!");
-        setTimeout(() => router.refresh(), 2000); // Refresh the page to reflect changes
+        setTimeout(() => router.refresh(), 2000);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile. Please try again.");
@@ -108,7 +134,7 @@ export default function UserProfileManagement({user}) {
               value={formData.firstName}
               onChange={handleChange}
               className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
+              
             />
           </div>
           <div>
@@ -122,7 +148,7 @@ export default function UserProfileManagement({user}) {
               value={formData.lastName}
               onChange={handleChange}
               className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
+              
             />
           </div>
         </div>
@@ -139,7 +165,7 @@ export default function UserProfileManagement({user}) {
             value={formData.currentPassword}
             onChange={handleChange}
             className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
+            
           />
         </div>
 

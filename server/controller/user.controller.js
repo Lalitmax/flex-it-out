@@ -172,24 +172,29 @@ export const getProfile = async (req, res) => {
 
 export const updateNameAndPass = async (req, res) => {
   try {
-    const { name, oldPassword, newPassword } = req.body;
+    console.log(req.body)
+    const { firstName, lastName, oldPassword, newPassword } = req.body;
     const user = await User.findById(req.user.id);
+    console.log(user)
 
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
-    if (name) user.name = name;
+    // Update name fields if provided
+    if (firstName) user.name = firstName;
+    if (lastName) user.surname = lastName;
 
+    // Password update logic
     if (oldPassword && newPassword) {
       const isMatch = await bcrypt.compare(oldPassword, user.password);
 
       if (!isMatch) {
-        return res.status(400).json({
-          success: false,
-          message: "Incorrect password",
-        });
+        return res.status(400).json({ success: false, message: "Incorrect password" });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({ success: false, message: "New password must be at least 8 characters long" });
       }
 
       user.password = await bcrypt.hash(newPassword, 10);
@@ -200,14 +205,13 @@ export const updateNameAndPass = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
+      user: { firstName: user.firstName, lastName: user.lastName }, // Send updated details
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 export const deleteAccount = async (req, res) => {
   try {
@@ -343,7 +347,7 @@ export const resetDailyExercise = async () => {
 };
 
 // Schedule reset for 11:31 PM daily
-cron.schedule("12 0 * * *", () => {
+cron.schedule("4 1 * * *", () => {
     console.log("Running daily exercise reset...");
     resetDailyExercise();
   });
