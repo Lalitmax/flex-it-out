@@ -72,7 +72,7 @@ const FitnessTracker = () => {
 
   const updateExerciseCount = async (exercise) => {
     try {
-        console.log(exercise);
+      console.log(exercise);
       const inc = await axios.post(
         "http://localhost:5000/api/v1/user/updateExerciseCount",
         { exercise },
@@ -131,29 +131,29 @@ const FitnessTracker = () => {
 
       setStage((prevStage) => {
         if (angle > thresholds[0] && prevStage !== "up") {
-            return "up";
+          return "up";
         }
         if (angle < thresholds[1] && prevStage === "up") {
-            setCounter((prev) => {
-                const newCount = prev + 0.5;
-                if (newCount % 1 === 0) {
-                    const currentExerciseUp = localStorage.getItem('currentExercise')|| "curl"
-                    updateExerciseCount(currentExerciseUp); // 🔥 Fix: Ensure correct exercise is passed
-                }
-                return newCount;
-            });
-            return "down";
+          setCounter((prev) => {
+            const newCount = prev + 0.5;
+            if (newCount % 1 === 0) {
+              const currentExerciseUp = localStorage.getItem('currentExercise') || "curl"
+              updateExerciseCount(currentExerciseUp); // 🔥 Fix: Ensure correct exercise is passed
+            }
+            return newCount;
+          });
+          return "down";
         }
         return prevStage;
-    });
-    
+      });
+
     } catch (error) {
       console.error("Error processing pose data:", error);
     }
   };
 
   const changeExercise = (exercise) => {
-    localStorage.setItem('currentExercise',exercise);
+    localStorage.setItem('currentExercise', exercise);
     setCurrentExercise(exercise);
     setCounter(0);
     setStage(null);
@@ -161,12 +161,12 @@ const FitnessTracker = () => {
   };
 
 
-  useEffect(()=>{
-    localStorage.setItem('currentExercise',"curl");
-  },[])
+  useEffect(() => {
+    localStorage.setItem('currentExercise', "curl");
+  }, [])
 
   useEffect(() => {
-  
+
     const handleKeyPress = (e) => {
       const keyMap = { 1: "curl", 2: "squat", 3: "pushup" };
       if (keyMap[e.key]) changeExercise(keyMap[e.key]);
@@ -239,11 +239,9 @@ const FitnessTracker = () => {
                   <button
                     key={key}
                     onClick={() => changeExercise(key)}
-                    className={`p-2 rounded-lg text-sm font-medium transition-all ${
-                      currentExercise === key ? "text-white" : "text-gray-400"
-                    } ${
-                      currentExercise === key ? "scale-105" : "hover:scale-95"
-                    }`}
+                    className={`p-2  border rounded-lg text-sm font-medium transition-all ${currentExercise === key ? "text-white" : "text-gray-400"
+                      } ${currentExercise === key ? "scale-105" : "hover:scale-95"
+                      }`}
                     style={{
                       backgroundColor:
                         currentExercise === key ? ex.color : "#2D3748",
@@ -261,32 +259,31 @@ const FitnessTracker = () => {
 
             {/* Angle History */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">
-                ANGLE HISTORY
-              </h3>
-              <div className="space-y-2">
-                {angleHistory.map((angle, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center bg-gray-700 rounded-md p-2"
-                  >
-                    <div className="w-20 text-xs text-gray-400">
-                      Frame {i + 1}
+              <h3 className="text-xs font-semibold text-gray-400 mb-2">ANGLE HISTORY</h3>
+              <div className="space-y-1">
+                {Array.from({ length: 5 }).map((_, i) => {
+                  const angle = angleHistory[i] || null; // Use null for empty frames
+                  return (
+                    <div
+                      key={i}
+                      className="flex h-5 items-center bg-gray-700 rounded-md p-4"
+                    >
+                      <div className="w-16 text-sm text-gray-400">Frame {i + 1}</div>
+                      <div className="flex-1 h-1.5 bg-gray-600 rounded-full">
+                        <div
+                          className="h-1.5 rounded-full transition-all"
+                          style={{
+                            width: angle ? `${(angle / 180) * 100}%` : "0%", // Show 0% width if angle is null
+                            backgroundColor: angle ? exercises[currentExercise].color : "transparent", // Transparent if no angle
+                          }}
+                        />
+                      </div>
+                      <div className="w-10 text-right text-xs">
+                        {angle ? angle.toFixed(1) + "°" : "-"}
+                      </div>
                     </div>
-                    <div className="flex-1 h-2 bg-gray-600 rounded-full">
-                      <div
-                        className="h-2 rounded-full transition-all"
-                        style={{
-                          width: `${(angle / 180) * 100}%`,
-                          backgroundColor: exercises[currentExercise].color,
-                        }}
-                      />
-                    </div>
-                    <div className="w-12 text-right text-sm">
-                      {angle?.toFixed(1)}°
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
