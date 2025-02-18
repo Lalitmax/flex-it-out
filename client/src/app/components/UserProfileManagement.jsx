@@ -41,7 +41,7 @@ export default function UserProfileManagement() {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/v1/user/getProfile",
+          "https://flex-it-out.onrender.com/api/v1/user/getProfile",
           {
             withCredentials: true,
           }
@@ -95,7 +95,7 @@ export default function UserProfileManagement() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/user/updateNameAndPass",
+        "https://flex-it-out.onrender.com/api/v1/user/updateNameAndPass",
         {
           firstName: formData.firstName,
           lastName: formData.lastName,

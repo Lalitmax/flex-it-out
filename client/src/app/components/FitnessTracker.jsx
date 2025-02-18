@@ -74,7 +74,7 @@ const FitnessTracker = () => {
     try {
       console.log(exercise);
       const inc = await axios.post(
-        "http://localhost:5000/api/v1/user/updateExerciseCount",
+        "https://flex-it-out.onrender.com/api/v1/user/updateExerciseCount",
         { exercise },
         { withCredentials: true } // Ensures cookies/session are sent
       );
