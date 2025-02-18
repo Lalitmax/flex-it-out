@@ -5,6 +5,8 @@ import axios from "axios"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from "recharts"
 import "react-circular-progressbar/dist/styles.css"
+import { useSelector } from "react-redux"
+import { useRouter } from "next/navigation"
 
 const Analytics = () => {
   const [data, setData] = useState({
@@ -16,6 +18,16 @@ const Analytics = () => {
   const [history, setHistory] = useState([]);
   const [dailyGoal, setDailyGoal] = useState(100);
   const [isEditing, setIsEditing] = useState(false); // New state for editing mode
+  const router = useRouter()
+  
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    console.log(isAuthenticated);
+    if (!isAuthenticated) {
+      router.push("/auth/login");
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const savedGoal = localStorage.getItem("dailyGoal");

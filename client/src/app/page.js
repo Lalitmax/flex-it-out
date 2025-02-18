@@ -1,6 +1,9 @@
-import Navbar from "./components/Navbar"
-import Hero from "./components/Hero"
-import FitnessTracker from "./components/FitnessTracker"
+'use client'
+import dynamic from 'next/dynamic';
+
+
+const Hero = dynamic(() => import('./components/Hero'), { ssr: false });
+const Navbar = dynamic(() => import('./components/Navbar'), { ssr: false });
 
 
 export default function Page() {
