@@ -5,6 +5,8 @@ import { useState, memo, useRef, useEffect } from 'react';
 import AgoraVoiceCalling from './AgoraVoiceCalling';
 import { FaPlay, FaStop, FaDumbbell, FaRunning, FaFire } from 'react-icons/fa';
 import { useRouter } from "next/navigation";
+import { socket } from '@/lib/socket';
+import { useSelector } from 'react-redux';
 
 const Challenges = memo(({ roomId }) => {
     const exercises = {
@@ -24,11 +26,16 @@ const Challenges = memo(({ roomId }) => {
     const router = useRouter();
     const channelName = roomId;
 
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+    const userData = useSelector((state) => state.auth.user);
+
     const changeExercise = (exercise) => {
         setExerciseType(exercise);
     };
 
     const onClickToggle = () => {
+
+        socket.emit('message', { name: 'Lalit' });
         if (isRunning) {
             clearInterval(intervalRef.current);
             setTimer(0);
@@ -58,7 +65,20 @@ const Challenges = memo(({ roomId }) => {
 
     useEffect(() => {
         console.log('reps:', repsCount);
+        const dataOfDoing = { room: roomId, name: userData.name, exerciseType, repsCount, repsLimit };
+        socket.emit("doing", dataOfDoing);
     }, [repsCount]);
+
+
+
+    useEffect(() => {
+        if (roomId) {
+            socket.emit("join_room", roomId);
+        }
+        return () => {
+            socket.emit("leave_room", roomId);
+        };
+    }, [roomId]);
 
     return (
         <div className="p-4 bg-gray-900 rounded-3xl mt-5">
