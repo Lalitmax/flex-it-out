@@ -7,8 +7,9 @@ import { FaPlay, FaStop, FaDumbbell, FaRunning, FaFire } from 'react-icons/fa';
 import { useRouter } from "next/navigation";
 import { socket } from '@/lib/socket';
 import { useSelector } from 'react-redux';
+import { AlertShow } from './AlertShow';
 
-const Challenges = memo(({ roomId }) => {
+const Challenges = memo(({ roomId, clientId }) => {
     const exercises = {
         curl: { joints: ["shoulder", "elbow", "wrist"], thresholds: [160, 30], color: "#FF0000", icon: <FaDumbbell /> },
         squat: { joints: ["hip", "knee", "ankle"], thresholds: [160, 90], color: "#00FF00", icon: <FaRunning /> },
@@ -22,7 +23,12 @@ const Challenges = memo(({ roomId }) => {
     const [isRunning, setIsRunning] = useState(false);
     const [isSettingLimit, setIsSettingLimit] = useState(false); // Track if setting limit
     const [inputValue, setInputValue] = useState(0); // Store input value
+    const [remoteReps, setRemoteReps] = useState('0');
+    const [limitVal, setLimitVal] = useState();
+    const [remoteUserName, setRemoteUsername] = useState();
+    const [winnrerAnnounce, setWinnrerAnnounce] = useState(false);
     const intervalRef = useRef(null);
+
     const router = useRouter();
     const channelName = roomId;
 
@@ -35,27 +41,32 @@ const Challenges = memo(({ roomId }) => {
 
     const onClickToggle = () => {
 
-        socket.emit('message', { name: 'Lalit' });
         if (isRunning) {
             clearInterval(intervalRef.current);
             setTimer(0);
             setIsRunning(false);
+
+            const details = { room: roomId, clientId, startTime: "off" };
+            socket.emit('startTimer', details);
         } else {
             intervalRef.current = setInterval(() => {
                 setTimer(prev => prev + 1);
             }, 1000);
             setIsRunning(true);
+            const details = { room: roomId, clientId, startTime: "on" };
+            socket.emit('startTimer', details);
         }
     };
 
     const handleSetLimit = () => {
+        setLimitVal(inputValue);
+
         if (isSettingLimit) {
             // Save the limit
             const limit = parseInt(inputValue, 10);
             if (!isNaN(limit)) { // Fixed the missing parenthesis
                 setRepsLimit(limit);
                 setIsSettingLimit(false); // Disable input after saving
-                setInputValue(''); // Clear input
             }
         } else {
             // Enable input for setting limit
@@ -64,19 +75,84 @@ const Challenges = memo(({ roomId }) => {
     };
 
     useEffect(() => {
-        console.log('reps:', repsCount);
-        const dataOfDoing = { room: roomId, name: userData.name, exerciseType, repsCount, repsLimit };
-        socket.emit("doing", dataOfDoing);
-    }, [repsCount]);
+        if (isRunning) {
+            if (repsCount == repsLimit) {
+                socket.emit('winner', { clientId, room: roomId });
+            }
+        }
 
 
+    }, [timer])
+
+    useEffect(() => {
+        if (roomId) {
+            const dataOfDoing = {
+                room: roomId,
+                clientId: clientId,
+                name: userData?.name,
+                exerciseType,
+                repsCount,
+                repsLimit
+            };
+            socket.emit("doing", dataOfDoing);
+        }
+        console.log('yes', roomId)
+
+        const handleDoing = (data) => {
+            if (data.clientId != clientId) {
+                setRemoteReps(data.repsCount);
+                setExerciseType(data.exerciseType);
+                setRepsLimit(data.repsLimit);
+                setRemoteUsername(data.name);
+            }
+            console.log(data);
+        };
+
+        const handleStartTimer = (data) => {
+            if (data.clientId != clientId) {
+                if (data.startTime === "on") {
+                    setIsRunning(true);
+                    intervalRef.current = setInterval(() => {
+                        setTimer(prev => prev + 1);
+                    }, 1000);
+                } else {
+                    setIsRunning(false);
+                    clearInterval(intervalRef.current);
+                    setTimer(0);
+                }
+            }
+        };
+
+        const winnerDiclare = (data) => {
+            if (data.clientId != clientId) {
+                if (repsLimit == remoteReps || repsLimit == repsCount) {
+                    setWinnrerAnnounce(true);
+                }
+
+
+
+            }
+        }
+
+        socket.on("winner", winnerDiclare); // Listen to the correct event
+        socket.on("startTimer", handleStartTimer); // Listen to the correct event
+        socket.on("doing", handleDoing); // Listen to the correct event
+
+        return () => {
+            socket.off("startTimer", handleStartTimer); // Cleanup to avoid duplicate listeners
+            socket.off("doing", handleDoing); // Cleanup to avoid duplicate listeners
+        };
+    }, [roomId, repsCount, userData?.name, exerciseType, repsLimit]);
 
     useEffect(() => {
         if (roomId) {
             socket.emit("join_room", roomId);
         }
+
         return () => {
-            socket.emit("leave_room", roomId);
+            if (roomId) {
+                socket.emit("leave_room", roomId);
+            }
         };
     }, [roomId]);
 
@@ -97,11 +173,11 @@ const Challenges = memo(({ roomId }) => {
                                 <span className="text-blue-500">My Reps:</span> {repsCount}
                             </div>
                             <div className="text-lg font-semibold text-white">
-                                <span className="text-green-500">Remote:</span> {0}
+                                <span className="text-green-500">Remote:</span> {remoteReps}
                             </div>
                         </div>
                         <div className="text-center text-lg font-semibold text-white mb-4">
-                            <span className="text-green-500">Limit:</span> {repsLimit}
+                            <span className="text-green-500">Reps Limit:</span> {repsLimit}
                         </div>
                         <div className="flex justify-center">
                             <Button
@@ -135,15 +211,18 @@ const Challenges = memo(({ roomId }) => {
                             ))}
                         </div>
                         <div className="mt-4 flex justify-center items-center gap-2">
-                            <input
-                                type="number"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                placeholder={`${inputValue}`}
-                                className="px-4 py-2 w-24 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                aria-label="Reps Limit Input"
-                                disabled={!isSettingLimit} // Disable input unless setting limit
-                            />
+                            {isSettingLimit &&
+                                <input
+                                    type="number"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    placeholder={`${inputValue}`}
+                                    className="px-4 py-2 w-24 text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    aria-label="Reps Limit Input"
+                                    disabled={!isSettingLimit} // Disable input unless setting limit
+                                />
+
+                            }
                             <Button
                                 onClick={handleSetLimit}
                                 className={`px-4 py-2 ${isSettingLimit ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
@@ -158,6 +237,24 @@ const Challenges = memo(({ roomId }) => {
                     <div className="border-2 border-gray-700 rounded-lg p-4 bg-gray-800 shadow-lg">
                         <AgoraVoiceCalling channelName={channelName} />
                     </div>
+
+                    {winnrerAnnounce && <AlertShow myName={userData?.name} remoteUserName={remoteUserName} repsCount={repsCount} remoteReps={remoteReps} isRunning={isRunning} timer={timer}
+                        onClose={() => {
+                            setIsRunning(false);
+                            clearInterval(intervalRef.current);
+                            setTimer(0);
+                            setRepsCount(0);
+                            setRemoteReps(0);
+                            setWinnrerAnnounce(false); // Close the winner announcement dialog
+
+                            // Optionally, you can reset other states here
+                            setExerciseType("curl"); // Reset to default exercise
+                            setRepsLimit(0); // Reset the reps limit
+
+                            setInputValue(0); // Reset the input value
+
+
+                        }} />}
                 </div>
             </div>
         </div>
