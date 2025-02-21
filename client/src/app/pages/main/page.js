@@ -7,14 +7,16 @@ import Navbar from "@/app/components/Navbar";
 
 const Page = () => {
   const router = useRouter();
-  const currPathname = usePathname();  
+  const currPathname = usePathname();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   useEffect(() => {
-    console.log(isAuthenticated)
-    if (!isAuthenticated) {
-      router.push( "/auth/login");
+  
+    const token = localStorage.getItem("token"); //
+    if (!token) {
+      router.push("/auth/login");
     }
+
   }, [isAuthenticated, router, currPathname]);
 
   console.log(isAuthenticated)
