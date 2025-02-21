@@ -354,19 +354,19 @@ export const resetDailyExercise = async () => {
   }
 };
 
-<<<<<<< HEAD
+
 // Schedule reset for 11:31 PM daily
 cron.schedule("2 1 * * *", () => {
   console.log("Running daily exercise reset...");
   resetDailyExercise();
 });
-=======
+
 cron.schedule("4 1 * * *", () => {
     console.log("Running daily exercise reset...");
     resetDailyExercise();
   });
   
->>>>>>> 84e2af61db6718ade77343160adf98e6917a2cde
+
 
 export const getExerciseHistory = async (req, res) => {
   try {
