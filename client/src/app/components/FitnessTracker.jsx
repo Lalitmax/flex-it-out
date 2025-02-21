@@ -2,15 +2,20 @@
 import axios from "axios";
 
 import { useEffect, useRef, useState } from "react";
+import { Button } from "./ui/button";
 
-const exercises = {
-  curl: { joints: ["shoulder", "elbow", "wrist"], thresholds: [160, 30] },
-  squat: { joints: ["hip", "knee", "ankle"], thresholds: [160, 90] },
-  pushup: { joints: ["shoulder", "wrist", "elbow"], thresholds: [160, 90] },
-  shoulderPress: { joints: ["shoulder", "wrist", "elbow"], thresholds: [160, 90] },
-};
 
 const FitnessTracker = () => {
+
+  const [exercises, setExercises] = useState({
+    curl: { joints: ["shoulder", "elbow", "wrist"], thresholds: [160, 30] },
+    squat: { joints: ["hip", "knee", "ankle"], thresholds: [160, 90] },
+    pushup: { joints: ["shoulder", "wrist", "elbow"], thresholds: [60, 90] },
+    shoulderPress: { joints: ["shoulder", "wrist", "elbow"], thresholds: [160, 90] },
+  });
+  const [keyMap, setKeyMap] = useState({ 1: "curl", 2: "squat", 3: "pushup", 4: "shoulderPress" });
+
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [counter, setCounter] = useState(0);
@@ -21,6 +26,12 @@ const FitnessTracker = () => {
   const drawConnectorsRef = useRef(null);
   const drawLandmarksRef = useRef(null);
   const POSE_CONNECTIONS_REF = useRef(null);
+
+  // for custom hooks
+  const [showForm, setShowForm] = useState(false);
+  const [exerciseName, setExerciseName] = useState("curl");
+  const [joints, setJoints] = useState("");
+  const [thresholds, setThresholds] = useState("");
 
   useEffect(() => {
     async function loadMediaPipe() {
@@ -169,13 +180,26 @@ const FitnessTracker = () => {
   useEffect(() => {
 
     const handleKeyPress = (e) => {
-      const keyMap = { 1: "curl", 2: "squat", 3: "pushup" , 4:"shoulderPress"};
+
       if (keyMap[e.key]) changeExercise(keyMap[e.key]);
     };
 
     window.addEventListener("keypress", handleKeyPress);
     return () => window.removeEventListener("keypress", handleKeyPress);
   }, []);
+
+  // custom hooks
+  const handleSave = () => {
+    console.log("Joints:", joints);
+    console.log("Thresholds:", thresholds);
+    console.log("Show Form:", showForm);
+
+    // Reset form fields
+    setExerciseName("");
+    setJoints("");
+    setThresholds("");
+    setShowForm(false);
+  };
 
   return (
     <div className="  text-white font-poppins">
@@ -255,6 +279,37 @@ const FitnessTracker = () => {
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </button>
                 ))}
+              </div>
+
+              <div className="p-4">
+                <Button onClick={() => setShowForm(!showForm)}>Custom Exercise</Button>
+
+                {showForm && (
+                  <div className="mt-4 p-4 border rounded-lg shadow-md bg-gray-100">
+                    <input
+                      type="text"
+                      placeholder="Exercise Name"
+                      value={exerciseName}
+                      onChange={(e) => setExerciseName(e.target.value)}
+                      className="mb-2 w-full text-black"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Joints (comma-separated)"
+                      value={joints}
+                      onChange={(e) => setJoints(e.target.value)}
+                      className="mb-2 w-full text-black"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Thresholds (comma-separated)"
+                      value={thresholds}
+                      onChange={(e) => setThresholds(e.target.value)}
+                      className="mb-2 w-full text-black"
+                    />
+                    <Button onClick={handleSave} className="w-full">Save</Button>
+                  </div>
+                )}
               </div>
             </div>
 
