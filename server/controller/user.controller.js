@@ -355,22 +355,7 @@ export const saveExerciseSession = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-<<<<<<< HEAD
 
-
-// Schedule reset for 11:31 PM daily
-cron.schedule("2 1 * * *", () => {
-  console.log("Running daily exercise reset...");
-  resetDailyExercise();
-});
-
-cron.schedule("4 1 * * *", () => {
-    console.log("Running daily exercise reset...");
-    resetDailyExercise();
-  });
-=======
->>>>>>> testing
-  
 
 
 export const getExerciseHistory = async (req, res) => {
