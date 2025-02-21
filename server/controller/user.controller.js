@@ -354,11 +354,19 @@ export const resetDailyExercise = async () => {
   }
 };
 
+<<<<<<< HEAD
 // Schedule reset for 11:31 PM daily
 cron.schedule("2 1 * * *", () => {
   console.log("Running daily exercise reset...");
   resetDailyExercise();
 });
+=======
+cron.schedule("4 1 * * *", () => {
+    console.log("Running daily exercise reset...");
+    resetDailyExercise();
+  });
+  
+>>>>>>> 84e2af61db6718ade77343160adf98e6917a2cde
 
 export const getExerciseHistory = async (req, res) => {
   try {
@@ -375,6 +383,84 @@ export const getExerciseHistory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching exercise history:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+
+export const bmi = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id); 
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const { weight, height } = user;
+    const heightInMeters = height / 100;
+    const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(1);
+
+    let category;
+    let message;
+    let idealWeightRange;
+    let recommendedExercises = [];
+
+    if (bmi < 18.5) {
+      category = "Underweight";
+      idealWeightRange = [
+        (18.5 * heightInMeters * heightInMeters).toFixed(1),
+        (24.9 * heightInMeters * heightInMeters).toFixed(1)
+      ];
+      message = `You should gain at least ${(idealWeightRange[0] - weight).toFixed(1)} kg.`;
+      recommendedExercises = [
+        "Strength training",
+        "Yoga and flexibility exercises",
+        "Moderate cardio"
+      ];
+    } else if (bmi < 24.9) {
+      category = "Normal weight";
+      message = "You have a healthy weight. Maintain with balanced exercises.";
+      recommendedExercises = [
+        "Cardio",
+        "Strength training",
+        "Flexibility and mobility exercises"
+      ];
+    } else if (bmi < 29.9) {
+      category = "Overweight";
+      idealWeightRange = [
+        (18.5 * heightInMeters * heightInMeters).toFixed(1),
+        (24.9 * heightInMeters * heightInMeters).toFixed(1)
+      ];
+      message = `You should lose at least ${(weight - idealWeightRange[1]).toFixed(1)} kg.`;
+      recommendedExercises = [
+        "Cardio",
+        "Strength training",
+        "Core exercises"
+      ];
+    } else {
+      category = "Obese";
+      idealWeightRange = [
+        (18.5 * heightInMeters * heightInMeters).toFixed(1),
+        (24.9 * heightInMeters * heightInMeters).toFixed(1)
+      ];
+      message = `You should lose at least ${(weight - idealWeightRange[1]).toFixed(1)} kg.`;
+      recommendedExercises = [
+        "High-intensity cardio",
+        "Strength training",
+        "Low-impact exercises"
+      ];
+    }
+
+    res.status(200).json({
+      success: true,
+      bmi,
+      category,
+      message,
+      recommendedExercises,
+    });
+  } catch (error) {
+    console.error("Error calculating BMI:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
