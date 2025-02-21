@@ -27,7 +27,7 @@ export default function Navbar() {
       }
 
       const response = await axios.get(
-        "https://flex-it-out.onrender.com/api/v1/user/verifyToken",
+        "http://localhost:5000/api/v1/user/verifyToken",
         {
           withCredentials: true,
         }

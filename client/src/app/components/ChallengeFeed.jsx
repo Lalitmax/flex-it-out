@@ -73,7 +73,7 @@ const ChallengeFeed = ({ setRepsCount, exerciseType }) => {
         try {
             console.log(exercise);
             const inc = await axios.post(
-                "https://flex-it-out.onrender.com/api/v1/user/updateExerciseCount",
+                "http://localhost:5000/api/v1/user/updateExerciseCount",
                 { exercise },
                 { withCredentials: true }
             );
