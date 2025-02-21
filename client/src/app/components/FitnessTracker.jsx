@@ -189,34 +189,10 @@ const FitnessTracker = () => {
   }, []);
 
   // custom hooks
-
   const handleSave = () => {
-    if (!exerciseName || !joints || !thresholds) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    const newExercise = {
-      joints: joints.split(",").map((j) => j.trim()), // Convert input to an array
-      thresholds: thresholds.split(",").map(Number), // Convert input to an array of numbers
-    };
-
-    // Update exercises state
-    setExercises((prev) => ({
-      ...prev,
-      [exerciseName]: newExercise,
-    }));
-
-    // Generate a new key dynamically
-    const newKey = Object.keys(keyMap).length + 1;
-
-    // Update keyMap state
-    setKeyMap((prev) => ({
-      ...prev,
-      [newKey]: exerciseName,
-    }));
-
-    localStorage.setItem('currentExercise', exerciseName);
+    console.log("Joints:", joints);
+    console.log("Thresholds:", thresholds);
+    console.log("Show Form:", showForm);
 
     // Reset form fields
     setExerciseName("");
@@ -224,7 +200,6 @@ const FitnessTracker = () => {
     setThresholds("");
     setShowForm(false);
   };
-
 
   return (
     <div className="  text-white font-poppins">
