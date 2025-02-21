@@ -172,13 +172,15 @@ export const getProfile = async (req, res) => {
 
 export const updateNameAndPass = async (req, res) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const { firstName, lastName, oldPassword, newPassword } = req.body;
     const user = await User.findById(req.user.id);
-    console.log(user)
+    console.log(user);
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // Update name fields if provided
@@ -190,11 +192,18 @@ export const updateNameAndPass = async (req, res) => {
       const isMatch = await bcrypt.compare(oldPassword, user.password);
 
       if (!isMatch) {
-        return res.status(400).json({ success: false, message: "Incorrect password" });
+        return res
+          .status(400)
+          .json({ success: false, message: "Incorrect password" });
       }
 
       if (newPassword.length < 8) {
-        return res.status(400).json({ success: false, message: "New password must be at least 8 characters long" });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "New password must be at least 8 characters long",
+          });
       }
 
       user.password = await bcrypt.hash(newPassword, 10);
@@ -211,7 +220,6 @@ export const updateNameAndPass = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 
 export const deleteAccount = async (req, res) => {
   try {
@@ -347,11 +355,10 @@ export const resetDailyExercise = async () => {
 };
 
 // Schedule reset for 11:31 PM daily
-cron.schedule("4 1 * * *", () => {
-    console.log("Running daily exercise reset...");
-    resetDailyExercise();
-  });
-  
+cron.schedule("2 1 * * *", () => {
+  console.log("Running daily exercise reset...");
+  resetDailyExercise();
+});
 
 export const getExerciseHistory = async (req, res) => {
   try {
