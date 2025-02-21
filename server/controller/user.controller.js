@@ -316,56 +316,46 @@ export const updateExerciseCount = async (req, res) => {
 };
 
 // Function to reset exercise data at 12 AM and store history
-export const resetDailyExercise = async () => {
+export const saveExerciseSession = async (req, res) => {
   try {
-    const users = await User.find(); // Get all users
+    const userId = req.user.id; 
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    for (let user of users) {
-      // Calculate total calories burned
-      const caloriesBurned =
-        user.pushUps * 0.29 + user.curls * 0.2 + user.squats * 0.32;
+    
+    const caloriesBurned =
+      user.pushUps * 0.29 + user.curls * 0.2 + user.squats * 0.32;
 
-      // Store today's data before resetting
-      if (user.pushUps > 0 || user.curls > 0 || user.squats > 0) {
-        user.exerciseHistory.push({
-          date: new Date(),
-          pushUps: user.pushUps,
-          curls: user.curls,
-          squats: user.squats,
-          caloriesBurned: parseFloat(caloriesBurned.toFixed(2)), // Rounded to 2 decimal places
-        });
+    
+    if (user.pushUps > 0 || user.curls > 0 || user.squats > 0) {
+      user.exerciseHistory.push({
+        date: new Date(),
+        pushUps: user.pushUps,
+        curls: user.curls,
+        squats: user.squats,
+        caloriesBurned: parseFloat(caloriesBurned.toFixed(2)), 
+      });
 
-        // Keep only last 10 days' data
-        if (user.exerciseHistory.length > 10) {
-          user.exerciseHistory.shift(); // Remove oldest entry
-        }
+      // Keep only last 10 days' data
+      if (user.exerciseHistory.length > 10) {
+        user.exerciseHistory.shift(); // Remove oldest entry
       }
-
-      // Reset today's exercise data
-      user.pushUps = 0;
-      user.curls = 0;
-      user.squats = 0;
-
-      await user.save();
     }
-    console.log("Exercise data reset at 11:31 PM");
+
+    // Reset today's exercise data
+    user.pushUps = 0;
+    user.curls = 0;
+    user.squats = 0;
+
+    await user.save();
+
+    return res.status(200).json({ success: true, message: "Session saved successfully" });
   } catch (error) {
-    console.error("Error resetting exercise data:", error);
+    console.error("Error saving session:", error);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
-
-// Schedule reset for 11:31 PM daily
-cron.schedule("2 1 * * *", () => {
-  console.log("Running daily exercise reset...");
-  resetDailyExercise();
-});
-
-cron.schedule("4 1 * * *", () => {
-    console.log("Running daily exercise reset...");
-    resetDailyExercise();
-  });
-  
 
 
 export const getExerciseHistory = async (req, res) => {
