@@ -23,7 +23,7 @@ export default function Leaderboard() {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch("https://flex-it-out.onrender.com/api/v1/user/getLeaderboard", {
+        const response = await fetch("http://localhost:5000/api/v1/user/getLeaderboard", {
           credentials: "include",
         });
         const data = await response.json();

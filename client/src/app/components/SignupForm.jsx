@@ -47,7 +47,7 @@ export default function SignupForm() {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://flex-it-out.onrender.com/api/v1/user/register", {
+      const response = await axios.post("http://localhost:5000/api/v1/user/register", {
         name: formData.name,
         surname: formData.surname,
         mobile: formData.mobile,
