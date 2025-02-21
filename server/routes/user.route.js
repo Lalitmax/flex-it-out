@@ -1,5 +1,5 @@
 import expess from "express";
-import { register } from "../controller/user.controller.js";
+import { bmi, register } from "../controller/user.controller.js";
 import { login } from "../controller/user.controller.js";
 import { getLeaderboard } from "../controller/user.controller.js";
 import { getProfile } from "../controller/user.controller.js";
@@ -24,6 +24,7 @@ router.route("/updateNameAndPass").post(isAuth, updateNameAndPass);
 router.route("/getAnalytics").get(isAuth, getAnalytics);
 router.route("/updateExerciseCount").post(isAuth, updateExerciseCount);
 router.route("/getExerciseHistory").get(isAuth, getExerciseHistory);
+router.route("/bmi").get(isAuth, bmi);
 
 
 export default router;
