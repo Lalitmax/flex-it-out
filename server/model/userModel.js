@@ -61,7 +61,19 @@ const userSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
-    exerciseHistory: [exerciseEntrySchema]  // Stores past 10 days' data
+    age:{
+        type:Number,
+        default:0
+    },
+    height:{
+        type:Number,
+        default:0.0
+    },
+    weight:{
+        type:Number,
+        default:0.0
+    },
+    exerciseHistory: [exerciseEntrySchema]
 }, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);
