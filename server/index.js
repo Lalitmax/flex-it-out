@@ -15,9 +15,11 @@ const app = express();
 const httpServer = createServer(app);
 
 // Initialize Socket.IO with CORS configuration
+const allowedOrigins = ["https://flex-it-out-azure.vercel.app", "http://localhost:3000"];
+
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST"]
   }
@@ -28,7 +30,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: function (origin, callback) {
+    // allow requests with no origin (eg. mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error("CORS not allowed by server"));
+  },
   credentials: true
 };
 

@@ -1,5 +1,9 @@
 import expess from "express";
-import { bmi, register, saveExerciseSession } from "../controller/user.controller.js";
+import {
+  bmi,
+  register,
+  saveExerciseSession,
+} from "../controller/user.controller.js";
 import { login } from "../controller/user.controller.js";
 import { getLeaderboard } from "../controller/user.controller.js";
 import { getProfile } from "../controller/user.controller.js";
@@ -25,7 +29,6 @@ router.route("/getAnalytics").get(isAuth, getAnalytics);
 router.route("/updateExerciseCount").post(isAuth, updateExerciseCount);
 router.route("/getExerciseHistory").get(isAuth, getExerciseHistory);
 router.route("/bmi").get(isAuth, bmi);
-router.route("/saveExerciseSession").get(isAuth,saveExerciseSession);
-
+router.route("/saveExerciseSession").get(isAuth, saveExerciseSession);
 
 export default router;
