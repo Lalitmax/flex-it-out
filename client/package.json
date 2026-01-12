@@ -2,13 +2,19 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+
+  "engines": {
+    "node": "20.x"
+  },
+
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
-  "type": "module",
+
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@mediapipe/camera_utils": "^0.3.1675466862",
@@ -20,15 +26,14 @@
     "agora-rtc-react": "^2.3.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
-    "client": "file:",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.3",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.475.0",
     "nanoid": "^5.1.0",
     "next": "15.1.7",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-circular-progressbar": "^2.1.0",
     "react-icons": "^5.4.0",
     "react-redux": "^9.2.0",
@@ -37,6 +42,7 @@
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7"
   },
+
   "devDependencies": {
     "postcss": "^8",
     "tailwindcss": "^3.4.1"

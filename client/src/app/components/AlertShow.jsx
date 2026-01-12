@@ -1,4 +1,4 @@
-"uce client"
+"use client"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -26,25 +26,31 @@ export function AlertShow({ myName,isRunning, remoteReps, repsCount,remoteUserNa
             setIsOpen(false);
         }
 
-        if(remoteReps < repsCount) {
+        // Only run localStorage reads/writes on the client
+        if (typeof window === "undefined") return;
+
+        if (remoteReps < repsCount) {
             setWinnerName(myName);
-            localStorage.setItem('timeTaken',timer);
-            
-
-        }else if(remoteReps ===repsCount){
+            localStorage.setItem("timeTaken", timer);
+            setTimeTaken(timer);
+        } else if (remoteReps === repsCount) {
             setWinnerName("tie!");
-            localStorage.setItem('timeTaken',timer);
-
-         
-
-        }else {
+            localStorage.setItem("timeTaken", timer);
+            setTimeTaken(timer);
+        } else {
             setWinnerName(remoteUserName);
-            localStorage.setItem('timeTaken',timer);
-
-       
-
+            localStorage.setItem("timeTaken", timer);
+            setTimeTaken(timer);
         }
-    }, [isRunning]);
+    }, [isRunning, remoteReps, repsCount, myName, remoteUserName, timer]);
+
+    // Load last saved timeTaken on mount
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const saved = localStorage.getItem("timeTaken");
+            if (saved) setTimeTaken(saved);
+        }
+    }, []);
 
     
 
@@ -67,7 +73,7 @@ export function AlertShow({ myName,isRunning, remoteReps, repsCount,remoteUserNa
                 {winnerName} 🥇
             </h2>
             <p className="text-lg text-gray-600 mt-2">
-                Time Taken: <span className="font-medium text-gray-800">{localStorage.getItem('timeTaken')} ⏳</span>
+                Time Taken: <span className="font-medium text-gray-800">{timeTaken || "-"} ⏳</span>
             </p>
         </AlertDialogDescription>
 
