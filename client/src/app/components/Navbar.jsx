@@ -27,7 +27,7 @@ export default function Navbar() {
       }
 
       const response = await axios.get(
-        "http://localhost:5000/api/v1/user/verifyToken",
+        "https://flex-it-out-3tml.vercel.app/api/v1/user/verifyToken",
         {
           withCredentials: true,
         }

@@ -37,10 +37,10 @@ const Analytics = () => {
   const fetchData = async () => {
     try {
       const [analyticsRes, historyRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/v1/user/getAnalytics", {
+        axios.get("https://flex-it-out-3tml.vercel.app/api/v1/user/getAnalytics", {
           withCredentials: true,
         }),
-        axios.get("http://localhost:5000/api/v1/user/getExerciseHistory", {
+        axios.get("https://flex-it-out-3tml.vercel.app/api/v1/user/getExerciseHistory", {
           withCredentials: true,
         }),
       ]);

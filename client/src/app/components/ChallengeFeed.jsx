@@ -54,9 +54,23 @@ const ChallengeFeed = ({ setRepsCount, exerciseType }) => {
                 },
                 width: 640,
                 height: 480,
+                facingMode: "user",
             });
 
-            camera.start();
+            try {
+                await camera.start();
+            } catch (err) {
+                console.error("Camera.start failed, falling back to getUserMedia:", err);
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                        await videoRef.current.play();
+                    }
+                } catch (e) {
+                    console.error("getUserMedia fallback failed:", e);
+                }
+            }
         }
 
         loadMediaPipe();
@@ -73,7 +87,7 @@ const ChallengeFeed = ({ setRepsCount, exerciseType }) => {
         try {
             console.log(exercise);
             const inc = await axios.post(
-                "http://localhost:5000/api/v1/user/updateExerciseCount",
+                "https://flex-it-out-3tml.vercel.app/api/v1/user/updateExerciseCount",
                 { exercise },
                 { withCredentials: true }
             );
@@ -172,9 +186,9 @@ const ChallengeFeed = ({ setRepsCount, exerciseType }) => {
         <div className="text-white font-poppins  ">
             <div className="container mx-auto px-4">
                 <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="flex-1 relative rounded-xl overflow-hidden shadow-2xl border-2 border-blue-600">
-                        <video ref={videoRef} autoPlay className="w-full h-full object-cover" />
-                        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+                    <div className="flex-1 relative rounded-xl overflow-hidden shadow-2xl border-2 border-blue-600 min-h-64">
+                        <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover z-0" />
+                        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
 
                         <div className="absolute bottom-4 right-4 h-28 w-24 bg-gray-800 rounded-xl p-2 shadow-2xl flex flex-col justify-center items-center">
                             <div className="text-xs font-bold text-center mb-1">

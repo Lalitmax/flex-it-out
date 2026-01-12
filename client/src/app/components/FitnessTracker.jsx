@@ -67,9 +67,23 @@ const FitnessTracker = () => {
         },
         width: 640,
         height: 480,
+        facingMode: "user",
       });
 
-      camera.start();
+      try {
+        await camera.start();
+      } catch (err) {
+        console.error("Camera.start failed, falling back to getUserMedia:", err);
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            await videoRef.current.play();
+          }
+        } catch (e) {
+          console.error("getUserMedia fallback failed:", e);
+        }
+      }
     }
 
     loadMediaPipe();
@@ -86,7 +100,7 @@ const FitnessTracker = () => {
     try {
       console.log(exercise);
       const inc = await axios.post(
-        "http://localhost:5000/api/v1/user/updateExerciseCount",
+        "https://flex-it-out-3tml.vercel.app/api/v1/user/updateExerciseCount",
         { exercise },
         { withCredentials: true } // Ensures cookies/session are sent
       );
@@ -206,15 +220,17 @@ const FitnessTracker = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Video Preview Section */}
-          <div className="flex-1 border-2 border-blue-600 relative rounded-xl overflow-hidden shadow-2xl">
+          <div className="flex-1 border-2 border-blue-600 relative rounded-xl overflow-hidden shadow-2xl min-h-64">
             <video
               ref={videoRef}
               autoPlay
-              className="absolute inset-0 w-full h-full object-cover"
+              playsInline
+              muted
+              className="absolute inset-0 w-full h-full object-cover z-0"
             />
             <canvas
               ref={canvasRef}
-              className="absolute inset-0 w-full h-full"
+              className="absolute inset-0 w-full h-full z-10 pointer-events-none"
             />
           </div>
 

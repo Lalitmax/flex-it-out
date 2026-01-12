@@ -14,7 +14,7 @@ export default function Hero() {
   const handleExitSession = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/v1/user/saveExerciseSession",
+        "https://flex-it-out-3tml.vercel.app/api/v1/user/saveExerciseSession",
         { withCredentials: true }
       );
       if (response.data.success) {
